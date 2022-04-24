@@ -1,0 +1,96 @@
+version: '3.7'
+
+
+services:
+
+   https:
+    image: caddy:latest
+    container_name: https
+    ports:
+      - 80:80
+      - 443:443
+    restart: always
+    environment:
+      - URL_FRONT=https://uefabot.com
+      - URL_API=https://api.uefabot.com
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+
+   chat:
+      container_name: chat
+      build:
+         context: ./chat
+         target: build-env
+      volumes:
+         - ./chat:/app
+      ports:
+         - '3000:3000'
+      # environment:
+      # - URL_FRONT=https://uefabot.com
+      # - URL_API=https://api.uefabot.com
+      # - URL_AUTH=https://auth.uefabot.com
+      #command: 'env HOST=0.0.0.0 yarn dev'
+      env_file: .env
+      #command: 'env HOST=0.0.0.0 yarn build'
+      command: 'env HOST=0.0.0.0 yarn dev'
+
+   chat_server:
+      container_name: chat_server
+      build:
+         context: ./chat_server
+         dockerfile: Dockerfile
+      volumes:
+         - ./chat_server:/usr/src/app
+         - node_modules:/usr/src/app/node_modules
+      env_file: .env
+      ports:
+         - '3002:3002'
+      # depends_on:
+      #    - db
+      restart: always
+
+   auth_server:
+      container_name: auth_server
+      build:
+         context: ./auth
+         dockerfile: Dockerfile
+      volumes:
+         - ./auth:/usr/src/app
+         - node_modules:/usr/src/app/node_modules
+      env_file: .env
+      ports:
+         - '3003:3003'
+      # depends_on:
+      #    - db
+      restart: always
+      #command: 'npm start'
+
+   
+   redis:
+      container_name: redis
+      build:
+         context: ./redis
+         dockerfile: Dockerfile
+      restart: always
+      # logging:
+      #   driver: "gcplogs"
+      #   options:
+      #     gcp-log-cmd: "true"
+      expose:
+         - "6379"
+      ports:
+         - "6379:6379"
+         
+   install:
+      image: vuechat_chat_server:latest
+      depends_on:
+         - chat_server
+         - auth_server
+      volumes:
+         - ./chat_server:/usr/src/app/
+         - node_modules:/usr/src/app/node_modules
+      working_dir: /usr/src/app
+      command: sh -c "yarn install --no-lockfile && touch main.js"
+   
+volumes:
+   node_modules:

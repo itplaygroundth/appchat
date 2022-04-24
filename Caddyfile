@@ -1,0 +1,9 @@
+{$URL_API} {
+  reverse_proxy chat_server:3002
+  tls internal
+}
+
+{$URL_FRONT} {
+  reverse_proxy chat:3000
+  tls internal
+}

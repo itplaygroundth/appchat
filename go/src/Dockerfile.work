@@ -1,0 +1,22 @@
+FROM golang:1.15.5-alpine3.12 as builder
+
+ENV GO111MODULE=on
+ENV GOS=linux
+ENV GOARCH=amd64
+ENV CGO_ENABLED=0
+ADD . /src
+RUN cd /src && go build -o canyon -ldflags "-w -s" main.go
+
+FROM alpine:latest
+
+RUN apk update \
+        && apk upgrade \
+        && apk add --no-cache \
+        ca-certificates \
+        && update-ca-certificates 2>/dev/null || true
+
+WORKDIR /app
+COPY --from=builder /src/static /app/static
+COPY --from=builder /src/themes /app/themes
+COPY --from=builder /src/ /app/
+CMD /app

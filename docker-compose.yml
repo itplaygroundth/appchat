@@ -34,31 +34,31 @@ services:
       #command: 'env HOST=0.0.0.0 yarn build'
       command: 'env HOST=0.0.0.0 yarn dev'
 
-   # chat_server:
-   #    container_name: node_server
-   #    build:
-   #       context: ./node_server
-   #       dockerfile: Dockerfile
-   #    volumes:
-   #       - ./node_server:/usr/src/app
-   #       - node_modules:/usr/src/app/node_modules
-   #    env_file: .env
-   #    ports:
-   #       - '3002:3002'
-   #    # depends_on:
-   #    #    - db
-   #    restart: always
-
-   go_api:
-      container_name: go_api
+   chat_server:
+      container_name: node_server
       build:
-         context: ./go/src
+         context: ./node_server
          dockerfile: Dockerfile
+      volumes:
+         - ./node_server:/usr/src/app
+         - node_modules:/usr/src/app/node_modules
       env_file: .env
       ports:
-      - "8080:8080"
-      volumes:
-         - ./go/src/:/app
+         - '3002:3002'
+      # depends_on:
+      #    - db
+      restart: always
+
+   # go_api:
+   #    container_name: go_api
+   #    build:
+   #       context: ./go/src
+   #       dockerfile: Dockerfile
+   #    env_file: .env
+   #    ports:
+   #    - "8080:8080"
+   #    volumes:
+   #       - ./go/src/:/app
 
 
    auth_server:
@@ -96,7 +96,7 @@ services:
    install:
       image: vuechat_chat_server:latest
       depends_on:
-         #- chat_server
+         - chat_server
          - auth_server
       volumes:
          - ./node_server:/usr/src/app/

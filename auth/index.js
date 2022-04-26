@@ -11,7 +11,8 @@ Redis = require("ioredis"),
 app = express()
 const config = require('./config')
 let RedisStore = require("connect-redis")(session)
-const redis = new Redis({
+const channel = 'garageDoor';
+const pub = new Redis({
     port: config.redis.port, // Redis port
     host: config.redis.host, // Redis host
     username: "default", // needs Redis >= 6
@@ -38,14 +39,9 @@ const corsOpts = {
   app.use(cors(corsOpts))
   app.use(bodyParser.urlencoded({ extended: false }))
   app.use(bodyParser.json())
-  app.use(
-    session({
-      store: new RedisStore({ client: redis }),
-      saveUninitialized: false,
-      secret: config.secret,
-      resave: false,
-    })
-  )
+
+
+
   var islogin = false
 
   router.get('/', (req, res) => {
@@ -54,12 +50,21 @@ const corsOpts = {
     })
   })
 
-  router.get('/me',verifyToken,(req,res)=>{
-      
-      if(libauth.token(req.token)){
-          return res.json({data:{"username":random_name()}})
+  router.get('/me',verifyToken,async (req,res)=>{
+    const sess = req.session;
+    
+      if( sess.username && libauth.token(req.token)){
+        const keys = await pub.keys('*')
+        var reply = JSON.stringify({
+          method: 'listUsers', 
+          sendType: 'sendToAllClientsInRoom',
+          data: keys
+      });
+          pub.publish('index',reply);
+          return res.json({data:{"username":sess.username}})
       }else 
-          return res.json({data:{"msg":"invalid token"}})
+          return res.json({data:{"msg":"invalid token","username":sess.usersname}})
+          
   })
 
   function verifyToken(req, res, next) {
@@ -79,11 +84,60 @@ const corsOpts = {
   }
 
   router.post('/login', async (req, res) => {
+      const sess = req.session;
       const { email, password } = req.body;
       const token = libauth.create(password)
-      
+      sess.username = email
+      sess.password = password
+      sess.token  = token
+     // req.session.key = token
+     
       return res.json({data:{"user":email,"token":token}})
   });
 
+  router.get('/logout',(req,res)=>{
+    req.session.destroy(async (err)=>{
+      if(err){
+          console.log(err);
+      } else {
+        const keys = await pub.keys('*')
+        var reply = JSON.stringify({
+          method: 'listUsers', 
+          sendType: 'sendToAllClientsInRoom',
+          data: keys
+      });
+          pub.publish('index',reply );
+          res.end('done')
+      }
+  });
+  })
+  pub.on('error', function (err) {
+    console.log('Could not establish a connection with redis. ' + err);
+  });
+  pub.on('connect', function (err) {
+    console.log('Connected to redis successfully');
+  });
+
+
+  app.use(
+    session({
+      store: new RedisStore({ client: pub }),
+      saveUninitialized: false,
+      secret: config.secret,
+      resave: false,
+      cookie: {
+        secure: false, // if true only transmit cookie over https
+        httpOnly: false, // if true prevent client side JS from reading the cookie 
+        maxAge: 1000 * 60 * 10 // session max age in miliseconds
+    }
+    })
+  )
+    
+  // app.use(function (req, res, next) {
+  //   if (!req.session) {
+  //     return next(new Error("oh no")) // handle error
+  //   }
+  //   next() // otherwise continue
+  // })
   app.use('/api',router)
   app.listen(port,()=>console.log(`Server Auth run on Port:${port}`))

@@ -23,6 +23,16 @@ export default {
             password:''
         }
     },
+    mounted() {
+  this.socket = this.$nuxtSocket({
+    // nuxt-socket-io opts: 
+    name: 'chatSvc', // Use socket "home"
+    channel: '/index', // connect to '/index'
+
+    // socket.io-client opts:
+    reconnection: false
+  })
+},
     methods:{
      async login(e) {
         e.preventDefault();

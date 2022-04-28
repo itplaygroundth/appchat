@@ -137,7 +137,7 @@ const port = 3003 || process.env.PORT
       next()
     })
     .on("connection", async (socket) => {
-      console.log('connected....',socket.user.uid)
+      //console.log('connected....',socket.user.uid)
       if (socket.user.uid === undefined) {
         return;
       }
@@ -195,7 +195,9 @@ const port = 3003 || process.env.PORT
         }
       );
       socket.on("disconnect", async () => {
-        const userId = socket.user.id;
+
+        const userId = socket.user.uid;
+        
         await srem("online_users", userId);
         const msg = {
           ...socket.user,

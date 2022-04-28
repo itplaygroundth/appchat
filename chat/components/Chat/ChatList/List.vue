@@ -8,7 +8,7 @@
             <div v-for="(room,i) in processedRooms" :key="i">
               <ChatListItem
                 :key="room.id"
-                @click="setRoom(room.id)"
+                @click="setRoom(room.id.toString())"
                 :active="`${currentRoom === room.id}`"
                 :room="room"
               />
@@ -31,7 +31,7 @@ export default {
     },
     data(){
         return {
-            
+
         }
     },
     computed:{
@@ -46,8 +46,8 @@ export default {
         }
     },
     methods:{
-        
-       
+
+
     }
 }
 </script>

@@ -16,6 +16,13 @@ export const state = () => ({
     },
     async setCurrentroom({commit},room){
       commit('SET_CURRENT_ROOM',room)
+    },
+    async appendUsers({commit},payload){
+      commit('APPEND_USERS',payload)
+
+    },
+    async setRooms({commit},payload){
+      commit('SET_ROOMS',payload)
     }
   }
 
@@ -23,10 +30,10 @@ export const state = () => ({
     CLEAR(state){
       state.currentRoom="0"
       state.rooms={}
-      state.users={} 
+      state.users={}
     },
     SET_USER(state,payload){
-      
+
       state.users = { ...state.users, [payload.uid]: payload }
     },
     MAKE_USER_ONLINE(state,payload){
@@ -34,8 +41,22 @@ export const state = () => ({
     },
     SET_CURRENT_ROOM(state,room){
       state.currentRoom = room
+    },
+    APPEND_USERS(state,payload){
+      state.users = {...state.users, ...payload } ;
+    },
+    SET_ROOMS(state,payload){
+      const newRooms = payload;
+      const rooms = { ...state.rooms };
+      newRooms.forEach((room) => {
+        rooms[room.id] = {
+          ...room,
+          messages: rooms[room.id] && rooms[room.id].messages,
+        };
+      });
+      state.rooms = rooms
     }
-  
+
   }
 /*
  export const action = (state, action) => {
@@ -120,7 +141,7 @@ export const state = () => ({
           rooms: { ...state.rooms, [action.payload.id]: action.payload },
         };
       case "set rooms": {
-        
+
         const newRooms = action.payload;
         const rooms = { ...state.rooms };
         newRooms.forEach((room) => {
@@ -136,4 +157,3 @@ export const state = () => ({
     }
   };
   */
-  

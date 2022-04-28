@@ -28,13 +28,13 @@ export default {
         online:false,
         active:false,
         name:'',
-        lastseen:{message:'',date:''},
+        lastMessage:{message:'',date:''},
         room:'',
       }
     },
     methods:{
       onClick(){
-        
+
       }
     }
 }

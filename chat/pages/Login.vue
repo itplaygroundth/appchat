@@ -24,7 +24,7 @@ export default {
             password:''
         }
     },
- 
+
     methods:{
        ...mapActions({setUser:'setUser'}),
      async login(e) {
@@ -39,7 +39,7 @@ export default {
           await this.$auth.loginWith('local', {
             data: payload
           });
-          this.setUser({uid:this.$auth.user.id,online:true})
+          this.setUser({id:this.$auth.user.id,online:true})
           this.$router.push('/');
         } catch (e) {
           this.$router.push('/login');
@@ -47,7 +47,7 @@ export default {
       }
     }
 
-}   
+}
 </script>
  <style type="text/css">
       @media (min-width: 768px){

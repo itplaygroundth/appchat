@@ -7,11 +7,20 @@
 <script>
 import { mapActions } from "vuex"
 
-
+const parseRoomName = (names, username) => {
+  for (let name of names) {
+    if (typeof name !== 'string') {
+      name = name[0];
+    }
+    if (name !== username) {
+      return name;
+    }
+  }
+  return names[0];
+};
 
 export default {
   name: 'IndexPage',
-  middleware: 'auth',
   data(){
     return {
       messageRxd:'',
@@ -21,13 +30,31 @@ export default {
       myEmitErrors: {}
     }
   },
-   async asyncData({ store,$axios }) {
-    var response  = await $axios.get('api/users/online')
-    const rooms = response.data
+  middleware: 'auth',
+    async fetch() {
+     if (Object.values(this.$store.state.rooms).length === 0 && this.$store.$auth.user !== null) {
+          await this.$axios.get(`api/users/online`).then(x => x.data).then((users) => {
+                this.$store.dispatch('appendUsers',users);
+              });
+          await this.$axios.get(`api/rooms/${this.$store.$auth.user.id}`).then(x => x.data).then((rooms) => {
+             const payload = [];
+             rooms.forEach(({ id, names }) => {
+               payload.push({ id, name: parseRoomName(names, this.$store.$auth.user.email) });
+             });
+          this.$store.dispatch("setRooms",payload);
+          this.$store.dispatch("setCurrentroom","0");
+          })
+     }
+  },
 
-    return { rooms }
-   },
-  // computed:{
+
+  //  async asyncData({ store,$axios }) {
+  //   var response  = await $axios.get('api/users/online')
+  //   const rooms = response.data
+
+  //   return { rooms }
+  //  },
+  // // computed:{
   //   async rooms(){
   //     return await this.$axios.get('api/users/online')
   //   }
@@ -45,32 +72,11 @@ export default {
   this.socket.on('user.disconnected',(newUser)=>{
      this.$store.dispatch('setUser',newUser)
      //this.$stroe.dispatch('appendMessage',`${newUser.username} left`)
-    
+
   })
-   if (Object.values(this.$store.state.rooms).length === 0 && this.$auth.user !== null) {
-      console.log('getUserOnline')
-      // getOnlineUsers().then((users) => {
-      //   dispatch({
-      //     type: "append users",
-      //     payload: users,
-      //   });
-      // });
-      
-      // getRooms(user.id).then((rooms) => {
-      //   const payload = [];
-      //   rooms.forEach(({ id, names }) => {
-      //     payload.push({ id, name: parseRoomName(names, user.username) });
-      //   });
-       
-      //   dispatch({
-      //     type: "set rooms",
-      //     payload,
-      //   });
-      //   dispatch({ type: "set current room", payload: "0" });
-      // });
-    }
+
 },
- 
+
 methods: {
   ...mapActions({clear:'clear'}),
   async getMessage() {
@@ -85,7 +91,7 @@ methods: {
   async logout() {
         await this.$auth.logout();
         await this.socket.disconnect()
-        
+
   },
   onMessageSend(){
     //  socket.emit("message", {

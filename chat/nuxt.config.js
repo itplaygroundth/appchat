@@ -44,7 +44,8 @@ export default {
   },
   
   proxy: {
-    '/api/': { target: 'http://localhost:3003/api', pathRewrite: {'^/api/': ''}, changeOrigin: true }
+    //***** auth api server */
+    '/api/': { target: 'http://localhost:3003/', pathRewrite: {'^/api/': ''}, changeOrigin: true }
   },
   // axios: {
   //   baseURL: 'http://localhost:3003/api',
@@ -57,7 +58,7 @@ export default {
         endpoints: {
           login: { url: 'api/login', method: 'post', propertyName: 'data.token' },
           user: { url: 'api/me', method: 'get', propertyName: 'data' },
-          logout:  { url: 'api/logout', method: 'get', propertyName: 'data' },
+          logout:  { url: 'api/logout', method: 'post', propertyName: 'data' },
         }
       }
     },
@@ -67,52 +68,18 @@ export default {
   },
   io: {
     // module options
-    sockets: [{
-      name: 'main',
-      url: 'http://localhost:3000',
-      vuex:{},
-      namespace:{
-        '/index': {
-          emitters: ['getMessage2 + testMsg --> message2Rxd'],
-          listeners: ['chatMessage2', 'chatMessage3 --> message3Rxd']
-        },
-        '/examples': {
-          emitBacks: ['sample3', 'sample4 <-- myObj.sample4'],
-          emitters: [
-            'reset] getProgress + refreshInfo --> progress [handleDone'
-          ],
-          listeners: ['progress']
-        },
-        '/rooms':{
-          emitters:['getRooms --> rooms']
-        },
-        '/room':{
-          emitters:[
-            'joinRoom + joinMsg --> roomInfo',
-            'leaveRoom + leaveMsg'
-          ],
-          listeners:['joinedRoom [updateUsers','lefRoom [updateUsers']
-        },
-        '/channel':{
-          emitters:[
-            'joinChannel + joinMsg --> channelInfo',
-            'leaveChannel + leaveMsg',
-            'sendMsg + userMsg --> msgRxd [appendChats'
-          ],
-          listeners:[
-            'joinedChannel [updateChannelInfo',
-            'lefChannel [updateChannelInfo',
-            'chatMessage [appendChats'
-          ]
-        }
-      }
-    },
+    sockets: [ 
     {
       name: 'chatSvc',
       url:
         process.env.NODE_ENV === 'production'
           ? 'https://api.uefabet.com'
-          : 'http://localhost:3002'
+          : 'http://localhost:3003',
+      default: true,
+      
+     
+     
+      
     }]
   },
   // Build Configuration: https://go.nuxtjs.dev/config-build

@@ -17,7 +17,7 @@
 
           <ul class="overflow-auto h-[32rem]">
             <h2 class="my-2 mb-2 ml-2 text-lg text-gray-600">Chats</h2>
-            <li v-for="(user,i) in users" :key="i">
+            <li v-for="(user,i) in rooms" :key="i">
               <a
                 class="flex items-center px-3 py-2 text-sm transition duration-150 ease-in-out border-b border-gray-300 cursor-pointer hover:bg-gray-100 focus:outline-none">
                 <img class="object-cover w-10 h-10 rounded-full"
@@ -110,7 +110,6 @@
          <button @click="logout" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
       Logout
       </button>
-      {{users}}
       </div>
     </div>
 </template>
@@ -125,35 +124,46 @@ export default {
     return {
       messageRxd:'',
       user: this.$auth.user,
-      users:[],
       loggedIn: this.$auth.loggedIn,
       socket: null,
       myEmitErrors: {}
     }
   },
-  computed:{
-    // users(){
-    //   this.socket.on('listUsers',(data)=>{
-    //     console.log(data)
-    //     return data
-    //   })
-    // }
-  },
-async mounted() {
-  this.socket = this.$nuxtSocket({
-    // nuxt-socket-io opts: 
-    name: 'chatSvc', // Use socket "home"
-    channel: '/index', // connect to '/index'
+   async asyncData({ store,$axios }) {
+    var response  = await $axios.get('api/users/online')
+    const rooms = response.data
 
-    // socket.io-client opts:
-    reconnection: false,
-    emitErrorsProp: 'myEmitErrors'
-  })
-  const listener = (eventName, ...args) => {
-    console.log(eventName, args);
-  }
-  this.socket.onAny(listener);
+    return { rooms }
+   },
+  // computed:{
+  //   async rooms(){
+  //     return await this.$axios.get('api/users/online')
+  //   }
+  // },
+mounted () {
+  this.socket = this.$nuxtSocket({ channel: '/index',
+  extraHeaders: {
+     Authorization: `Bearer ${this.$auth.user.token}`,
+  }, 
+  withCredentials: true })
 },
+// async mounted() {
+
+//   this.socket = this.$nuxtSocket({
+//     // nuxt-socket-io opts: 
+//     name: 'chatSvc', // Use socket "home"
+//     channel: '/index', // connect to '/index'
+
+//     // socket.io-client opts:
+//     reconnection: false,
+//     emitErrorsProp: 'myEmitErrors',
+//     withCredentials: true
+//   })
+
+  
+
+  
+// },
 methods: {
   async getMessage() {
     this.messageRxd = await this.socket.emitP('getMessage2', { id: 'abc123' })

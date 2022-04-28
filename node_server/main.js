@@ -13,6 +13,7 @@ const http = require('http'),
   
 
 require('dotenv').config()
+require('events').EventEmitter.prototype._maxListeners = 100;
 const port = 3002 || process.env.PORT
 const host = "http://localhost" || process.env.URL_API
 const { channel } = require('diagnostics_channel');
@@ -24,25 +25,6 @@ const sub = new Redis({
   db:0
 });
 
-
-// var pub = redis.createClient();
-// var sub = redis.createClient();
-
-// sub.on("subscripbe",(channel,count)=>{
-//   console.log("Subscribed to " + channel + ". Now subscribed to " + count + " channel(s).");
-// });
-
-// sub.on("message", (channel, message)=> {
-//     console.log("Message from channel " + channel + ": " + message);
-// });
-
-// setInterval(function() {
-//   var no = Math.floor(Math.random() * 100);
-//   pub.publish('tungns', 'Generated Chat random no ' + no);
-// }, 5000);
-
-//sub.subscribe("tungns");
-// Store people in chatroom
 var chatters = [];
 
 // Store messages in chatroom
@@ -82,7 +64,7 @@ async function start() {
     //socket.on('getUsers',async (data)=>sub.subscribe(data))
     
   })
-  
+ 
   // Listen the server
   server.listen(port,()=>{
   console.log({

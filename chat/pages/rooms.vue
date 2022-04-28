@@ -20,19 +20,19 @@ export default {
         .toString()
         .slice(7)}`
     }
-  },
-  watch: {
-    async 'ioApi.ready' (n, o) {
-       this.rooms = await this.ioApi.getRooms()
-     }
-  },
-  mounted () {
-    this.socket = this.$nuxtSocket({
-      name: 'chatSvc',
-      channel: '/rooms',
-      serverAPI: true
-    })
-  }
+  // },
+  // watch: {
+  //   async 'ioApi.ready' (n, o) {
+  //      this.rooms = await this.ioApi.getRooms()
+  //    }
+  // },
+  // mounted () {
+  //   this.socket = this.$nuxtSocket({
+  //     name: 'chatSvc',
+  //     channel: '/rooms',
+  //     serverAPI: true
+  //   })
+   }
 }
 </script>
 

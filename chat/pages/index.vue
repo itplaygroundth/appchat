@@ -30,7 +30,7 @@
                   <span class="block ml-2 text-sm text-gray-600">bye</span>
                 </div>
               </a>
-             
+
             </li>
           </ul>
         </div>
@@ -140,17 +140,25 @@ export default {
   //     return await this.$axios.get('api/users/online')
   //   }
   // },
-mounted () {
+ beforeMount () {
   this.socket = this.$nuxtSocket({ channel: '/index',
   extraHeaders: {
      Authorization: `Bearer ${this.$auth.user.token}`,
-  }, 
+  },
   withCredentials: true })
+  this.socket.on('user.connected',(data)=>{
+    console.log('user connected',data)
+
+  }),
+  this.socket.on('user.disconnected',(data)=>{
+    console.log('user disconnected',data)
+  })
 },
+
 // async mounted() {
 
 //   this.socket = this.$nuxtSocket({
-//     // nuxt-socket-io opts: 
+//     // nuxt-socket-io opts:
 //     name: 'chatSvc', // Use socket "home"
 //     channel: '/index', // connect to '/index'
 
@@ -160,9 +168,9 @@ mounted () {
 //     withCredentials: true
 //   })
 
-  
 
-  
+
+
 // },
 methods: {
   async getMessage() {
@@ -176,6 +184,7 @@ methods: {
   },
   async logout() {
         await this.$auth.logout();
+        await this.socket.emitP('user:disconnect')
         this.$router.push('/login');
   }
 }

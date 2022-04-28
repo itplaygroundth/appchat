@@ -1,10 +1,11 @@
 export const state = () => ({
+    user:{},
     chatMessages: '',
     titleFromUser: '',
     action: false,
     action2: ''
   })
-  
+
   export const mutations = {
     SET_MESSAGE (state, chatMessage) {
       state.chatMessages += chatMessage
@@ -16,7 +17,7 @@ export const state = () => ({
       state.action2 = msg.toUpperCase()
     }
   }
-  
+
   export const actions = {
     FORMAT_MESSAGE ({ commit }, chatMessage) {
       const chatMessageFmt = `${new Date().toLocaleString()}: ${chatMessage}\r\n`

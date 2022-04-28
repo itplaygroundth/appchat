@@ -47,18 +47,6 @@ export default {
      }
   },
 
-
-  //  async asyncData({ store,$axios }) {
-  //   var response  = await $axios.get('api/users/online')
-  //   const rooms = response.data
-
-  //   return { rooms }
-  //  },
-  // // computed:{
-  //   async rooms(){
-  //     return await this.$axios.get('api/users/online')
-  //   }
-  // },
  beforeMount () {
   this.socket = this.$nuxtSocket({ channel: '/index',
   extraHeaders: {
@@ -67,11 +55,11 @@ export default {
   withCredentials: true })
   this.socket.on('user.connected',(newUser)=>{
      this.$store.dispatch('setUser',newUser)
-     //this.$stroe.dispatch('appendMessage',`${newUser.username} connected`)
+
   }),
   this.socket.on('user.disconnected',(newUser)=>{
      this.$store.dispatch('setUser',newUser)
-     //this.$stroe.dispatch('appendMessage',`${newUser.username} left`)
+
 
   })
 

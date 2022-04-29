@@ -221,11 +221,6 @@ const port = 3003 || process.env.PORT
     if (!totalUsersKeyExist) {
       /** This counter is used for the id */
       await set("total_users", 0);
-      /**
-       * Some rooms have pre-defined names. When the clients attempts to fetch a room, an additional lookup
-       * is handled to resolve the name.
-       * Rooms with private messages don't have a name
-       */
       await set(`room:${0}:name`, "General");
   
       /** Create demo data with the default users */

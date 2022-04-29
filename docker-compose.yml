@@ -94,7 +94,7 @@ services:
          - "6379:6379"
          
    install:
-      image: appchat_auth_server:latest
+      image: vuechat_auth_server:latest
       depends_on:
       #   - chat_server
          - auth_server

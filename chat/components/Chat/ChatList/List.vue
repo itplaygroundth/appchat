@@ -1,15 +1,15 @@
 <template>
     <div class="chat-list-container flex-column d-flex pr-4">
         <div class="py-2">
-          <p class="h5 mb-0 py-1 chats-title">Chats</p>
+          <p class="h5 mb-0 py-1 chats-title font-bold">Chats</p>
         </div>
-        <div class="messages-box flex flex-1">
+        <div class="messages-box flex-1">
           <div class="list-group rounded-0">
             <div v-for="(room,i) in processedRooms" :key="i">
               <ChatListItem
                 :key="room.id"
                 @click="setRoom(room.id.toString())"
-                :active="`${currentRoom === room.id}`"
+                :active="currentRoom === room.id"
                 :room="room"
               />
             </div>
@@ -19,6 +19,8 @@
       </div>
 </template>
 <script>
+import { mapActions } from "vuex";
+
 
 
 export default {
@@ -46,8 +48,31 @@ export default {
         }
     },
     methods:{
-
+      ...mapActions(['setRoom'])
 
     }
 }
 </script>
+<style scoped>
+
+.list-group-item {
+  cursor: pointer;
+  height: 70px;
+  box-sizing: border-box;
+  transition: background-color 0.1s ease-out;
+}
+.chats-title {
+  padding-left: 14px;
+}
+
+.messages-box,
+.chat-box {
+  /* height: 510px; */
+  width: 100%;
+}
+
+.chat-box-wrapper {
+  flex: 1;
+  overflow-y: scroll;
+}
+</style>

@@ -19,9 +19,9 @@ export default {
   // Global CSS: https://go.nuxtjs.dev/config-css
   css: [
     
-    '~/assets/css/style.css',
-    '~/assets/css/font-face.css',
-    '~/assets/css/style-overrides.css',
+    // '~/assets/css/style.css',
+    // '~/assets/css/font-face.css',
+    // '~/assets/css/style-overrides.css',
   ],
 
   // Plugins to run before rendering page: https://go.nuxtjs.dev/config-plugins
@@ -43,11 +43,26 @@ export default {
   buildModules: [
     // https://go.nuxtjs.dev/tailwindcss
     '@nuxtjs/tailwindcss',
-    '@nuxtjs/moment'
+    '@nuxtjs/moment',
+
   ],
 
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
+    [
+      'nuxt-fontawesome', {
+        imports: [
+         {
+           set: '@fortawesome/free-solid-svg-icons',
+           icons: ['fas']
+         },
+         {
+           set:'@fortawesome/free-brands-svg-icons',
+           icons: ['fab']
+         }
+       ]
+      }
+    ],
     '@nuxtjs/axios',
     '@nuxtjs/auth',
     'nuxt-socket-io',

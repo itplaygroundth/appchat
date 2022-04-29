@@ -1,14 +1,13 @@
 <template>
 <div
-    :class="`col-${col} d-flex align-items-center ${noinfo ? 'justify-content-end' : ''
-    }`"
+    class="flex gap-2 "
   >
-    <div :class="`align-self-center ${noinfo ? '' : 'mr-3'}`">
-      <ChatAvatar :name="user.username" :id="user.id" />
+    <div class="`align-self-center mr-3">
+      <ChatAvatar :url="url" :name="user.email" :id="user.id" />
     </div>
-      <div v-if="!noinfo" class="media-body">
-        <h5 class="font-size-14 mt-0 mb-1">{{user.username}}</h5>
-        <div class="d-flex align-items-center">
+      <div v-if="noinfo" class="flex-column">
+        <h5 class="font-size-14 mt-0 mb-1">{{user.email}}</h5>
+        <div class="flex items-center">
           <ChatOnlineIndicator :online=true />
           <p class="ml-2 text-muted mb-0">Active</p>
         </div>
@@ -19,12 +18,13 @@
 export default {
     name:'Userinfo',
     props:{
-        user:{type:Object}
+        user:{type:Object},
+        noinfo:{type:Boolean,default:false}
     },
     data(){
         return {
             col:7,
-            noinfo:false
+            url:'https://api.lorem.space/image/face?hash=33791'
         }
     }
 }

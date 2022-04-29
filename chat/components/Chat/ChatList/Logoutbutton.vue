@@ -1,12 +1,10 @@
 <template>
   <div
-    
+  @click="logout"
     style="cursor: 'pointer'"
-    :class="`col-${col} text-danger ${!noinfo ? 'text-right' : ''}`"
+    class="col-5 mt-5 gap-2 items-center text-red-600 text-right font-bold text-sm"
   >
-      <button @click="logout" class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded">
-      Logout
-      </button>
+    <font-awesome-icon :icon="['fas', 'power-off']"/><span class="pl-2">Log out</span>
   </div>  
 </template>
 <script>
@@ -15,11 +13,11 @@ export default
     name:'LogoutButton',
     props:{
     onLogOut:{type:Function},
+    noinfo:{type:Boolean,default:false}
     },
     data(){
         return {
-            col:5,
-            noinfo:false
+            col:5
         }
     },
     mounted() {

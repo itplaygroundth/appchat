@@ -26,7 +26,7 @@ export default {
     },
 
     methods:{
-       ...mapActions({setUser:'setUser'}),
+       //...mapActions({setUser:'setUser'}),
      async login(e) {
         e.preventDefault();
 
@@ -39,7 +39,7 @@ export default {
           await this.$auth.loginWith('local', {
             data: payload
           });
-          this.setUser({id:this.$auth.user.id,online:true})
+          //this.setUser({id:this.$auth.user.id,username:this.$auth.user.email,online:true})
           this.$router.push('/');
         } catch (e) {
           this.$router.push('/login');

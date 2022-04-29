@@ -20,8 +20,16 @@ const salt = bcrypt.genSaltSync(10);
 const { incr, set, hmset, sadd, hmget, exists,
   client: redisClient,
 } = require('./redis');
-module.exports = {
-    create: (password) => {
+
+  const getPrivateRoomId = (user1, user2) => {
+      if (isNaN(user1) || isNaN(user2) || user1 === user2) {
+        return null;
+      }
+      const minUserId = user1 > user2 ? user2 : user1;
+      const maxUserId = user1 > user2 ? user1 : user2;
+      return `${minUserId}:${maxUserId}`;
+    },
+    create = (password) => {
         try {
             const hashedPassword = bcrypt.hashSync(password,salt);
             return hashedPassword;
@@ -29,11 +37,11 @@ module.exports = {
            return { message: "Error"};
         }
     },
-    verify: async (password,repassword) => {
+    verify = async (password,repassword) => {
             var compare = await bcrypt.compare(password,repassword)
             return compare
     },
-    token:async (token)=>{
+    token = async (token)=>{
             await jwt.verify(token, process.env.TOKEN_SECRET,function(err, decoded) {
             if (err) {
               
@@ -48,18 +56,18 @@ module.exports = {
             }
           })
     },
-    retoken: (user) =>{
+    retoken= (user) =>{
       return jwt.sign({
         exp: Math.floor(Date.now() / 1000) + (60 * 60),
         data: {"uid":user}
       }, process.env.TOKEN_SECRET);
         //return jwt.sign(username, process.env.TOKEN_SECRET, { expiresIn: '1800s' });
     },
-    makeUsernameKey:  (username) => {
+    makeUsernameKey =  (username) => {
       const usernameKey = `username:${username}`;
       return usernameKey;
     },
-    createUser: async (username, password) => {
+    createUser = async (username, password) => {
       const usernameKey =  `username:${username}`;
       /** Create user */
       const hashedPassword = await bcrypt.hash(password, 10);
@@ -81,15 +89,8 @@ module.exports = {
       /** This one should go to the session */
       return { id: nextId, username,token };
     },
-    getPrivateRoomId: (user1, user2) => {
-      if (isNaN(user1) || isNaN(user2) || user1 === user2) {
-        return null;
-      }
-      const minUserId = user1 > user2 ? user2 : user1;
-      const maxUserId = user1 > user2 ? user1 : user2;
-      return `${minUserId}:${maxUserId}`;
-    },
-    createPrivateRoom: async (user1, user2) => {
+    
+    createPrivateRoom = async (user1, user2) => {
       const roomId = getPrivateRoomId(user1, user2);
     
       if (roomId === null) {
@@ -108,7 +109,7 @@ module.exports = {
         ],
       }, false];
     },
-    getMessages: async (roomId = "0", offset = 0, size = 50) => {
+    getMessages = async (roomId = "0", offset = 0, size = 50) => {
       /**
        * Logic:
        * 1. Check if room with id exists
@@ -129,7 +130,7 @@ module.exports = {
         });
       }
     },
-    sanitise: (text) => {
+    sanitise = (text) => {
       let sanitisedText = text;
     
       if (text.indexOf('<') > -1 || text.indexOf('>') > -1) {
@@ -140,6 +141,15 @@ module.exports = {
     }
     
     
-    
+module.exports = {
+  create,
+  verify,
+  token,
+  retoken,
+  makeUsernameKey,
+  createUser,
+  createPrivateRoom,
+  getMessages,sanitise
+
     
 }

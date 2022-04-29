@@ -28,7 +28,10 @@
         "node-random-name": "^1.0.1",
         "milliparsec": "^2.2.1",
         "nuxt-socket-io": "^2.0.3",
-        "@nuxtjs/moment":"^1.6.1"
+        "@nuxtjs/moment":"^1.6.1",
+        "@fortawesome/free-brands-svg-icons": "^6.1.1",
+        "@fortawesome/free-solid-svg-icons": "^6.1.1",
+        "@nuxtjs/fontawesome": "^1.1.2"
 
       
     }

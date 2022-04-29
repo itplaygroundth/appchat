@@ -148,21 +148,7 @@ router.get('/', (req, res) => {
     return res.sendStatus(200);
   });
 
-  /**
-   * Create a private room and add users to it
-   */
-  router.post("/room", auth, async (req, res) => {
-    const { user1, user2 } = {
-      user1: parseInt(req.body.user1),
-      user2: parseInt(req.body.user2),
-    };
-
-    const [result, hasError] = await createPrivateRoom(user1, user2);
-    if (hasError) {
-      return res.sendStatus(400);
-    }
-    return res.status(201).send(result);
-  });
+  
   router.post("/room", auth, async (req, res) => {
     const { user1, user2 } = {
       user1: parseInt(req.body.user1),
@@ -201,15 +187,18 @@ router.get('/', (req, res) => {
       return res.status(400).send(err);
     }
   });
+
   router.get(`/rooms/:userId`, auth, async (req, res) => {
     const userId = req.params.userId;
     /** We got the room ids */
     const roomIds = await smembers(`user:${userId}:rooms`);
+    
     const rooms = [];
     for (let x = 0; x < roomIds.length; x++) {
       const roomId = roomIds[x];
-
+    
       let name = await get(`room:${roomId}:name`);
+      
       /** It's a room without a name, likey the one with private messages */
       if (!name) {
         /**
@@ -217,11 +206,13 @@ router.get('/', (req, res) => {
          * It's okay to add custom (named rooms)
          */
         const roomExists = await exists(`room:${roomId}`);
+       
         if (!roomExists) {
           continue;
         }
 
         const userIds = roomId.split(":");
+        
         if (userIds.length !== 2) {
           return res.sendStatus(400);
         }

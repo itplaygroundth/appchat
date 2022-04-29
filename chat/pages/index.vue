@@ -32,13 +32,53 @@ export default {
   },
   middleware: 'auth',
     async fetch() {
+     
+      // if (this.socket) {
+      //       /**
+      //        * The socket needs to be joined to the newly added rooms
+      //        * on an active connection.
+      //        */
+      //       const newRooms = [];
+      //       Object.keys(this.$store.state.rooms).forEach((roomId) => {
+      //         const room = this.$store.state.rooms[roomId];
+      //         if (room.connected) {
+      //           return;
+      //         }
+      //         newRooms.push({ ...room, connected: true });
+      //         socket.emit("room.join", room.id);
+      //       });
+      //       if (newRooms.length !== 0) {
+      //         this.$store.dispatch("setRooms",newRooms);
+      //       }
+      //     } else {
+      //       /**
+      //        * It's necessary to set disconnected flags on rooms
+      //        * once the client is not connected
+      //        */
+      //       const newRooms = [];
+      //       Object.keys(this.$store.state.rooms).forEach((roomId) => {
+      //         const room = this.$store.state.rooms[roomId];
+      //         if (!room.connected) {
+      //           return;
+      //         }
+      //         newRooms.push({ ...room, connected: false });
+      //       });
+      //       /** Only update the state if it's only necessary */
+      //       if (newRooms.length !== 0) {
+      //         this.$store.dispatch("setRooms",newRooms);
+      //       }
+      //     }
+    
+
      if (Object.values(this.$store.state.rooms).length === 0 && this.$store.$auth.user !== null) {
           await this.$axios.get(`api/users/online`).then(x => x.data).then((users) => {
-                this.$store.dispatch('appendUsers',users);
+             //  console.log(users)
+               this.$store.dispatch('appendUsers',users);
               });
           await this.$axios.get(`api/rooms/${this.$store.$auth.user.id}`).then(x => x.data).then((rooms) => {
-             const payload = [];
-             rooms.forEach(({ id, names }) => {
+            
+           const payload = [];
+           rooms.forEach(({ id, names }) => {
                payload.push({ id, name: parseRoomName(names, this.$store.$auth.user.email) });
              });
           this.$store.dispatch("setRooms",payload);
@@ -47,22 +87,23 @@ export default {
      }
   },
 
- beforeMount () {
-  this.socket = this.$nuxtSocket({ channel: '/index',
-  extraHeaders: {
-     Authorization: `Bearer ${this.$auth.user.token}`,
-  },
-  withCredentials: true })
-  this.socket.on('user.connected',(newUser)=>{
-     this.$store.dispatch('setUser',newUser)
+ mounted () {
 
-  }),
-  this.socket.on('user.disconnected',(newUser)=>{
-     this.$store.dispatch('setUser',newUser)
+ this.socket = this.$nuxtSocket({ channel: '/index',
+      extraHeaders: {
+        Authorization: `Bearer ${this.$auth.user.token}`,
+      },
+      withCredentials: true })
+
+      this.socket.on('user.connected',(newUser)=>{
+        this.$store.dispatch('setUser',newUser)
+
+      })
+      this.socket.on('user.disconnected',(newUser)=>{
+        this.$store.dispatch('setUser',newUser)
 
 
-  })
-
+      })
 },
 
 methods: {
@@ -118,3 +159,11 @@ methods: {
 //   }
 // };
 </script>
+<style>
+body {
+  font-family: "Poppins", Arial, Helvetica, sans-serif;
+  font-size: 13px;
+  color: #495057;
+}
+
+</style>

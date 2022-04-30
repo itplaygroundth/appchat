@@ -14,6 +14,7 @@ const {config ,SERVER_ID } = require('./config')
 let RedisStore = require("connect-redis")(session)
 const channel = 'support';
 const jwt = require('jsonwebtoken');
+const libauth = require('./lib/auth')
 const {
   client: redisClient,
   exists,
@@ -28,6 +29,7 @@ const {
   srem,
   sub,
   auth: runRedisAuth,
+  zrangebyscore,
 } = require("./lib/redis");
  
 
@@ -161,12 +163,11 @@ const port = 3003 || process.env.PORT
         "message",
       
         async (message) => {
-          /** Make sure nothing illegal is sent here. */
-          message = { ...message, message: sanitise(message.message) };
-          /**
-           * The user might be set as offline if he tried to access the chat from another tab, pinging by message
-           * resets the user online status
-           */
+          
+          message = { ...message, message: libauth.sanitise(message.message) };
+          
+          
+
           await sadd("online_users", message.from);
           /** We've got a new message. Store it in db, then send back to the room. */
           const messageString = JSON.stringify(message);
@@ -177,6 +178,7 @@ const port = 3003 || process.env.PORT
            */
           const isPrivate = !(await exists(`${roomKey}:name`));
           const roomHasMessages = await exists(roomKey);
+          
           if (isPrivate && !roomHasMessages) {
             const ids = message.roomId.split(":");
             const msg = {
@@ -189,7 +191,13 @@ const port = 3003 || process.env.PORT
             publish("show.room", msg);
             socket.broadcast.emit(`show.room`, msg);
           }
-          await zadd(roomKey, "" + message.date, messageString);
+          
+          await zadd(roomKey,message.date, messageString);
+          // zrangebyscore(roomKey, 0, 2)
+          // .then((res) => console.log(res));
+          //await zadd("room:0",1,"message")
+          //await zadd(roomKey,message.date, messageString);
+          
           publish("message", message);
           io.to(roomKey).emit("message", message);
         }

@@ -34,7 +34,7 @@
 <script>
 export default {
     props:{
-        messageListElement:{type:String},
+        messageListElement:{type:Object},
         user: { type: Object },
         messages:{type:Array},
         room:{type:Object},

@@ -101,8 +101,9 @@ export default {
       })
       this.socket.on('user.disconnected',(newUser)=>{
         this.$store.dispatch('setUser',newUser)
-
-
+      })
+      this.socket.on('message',(message)=>{
+        console.log(message)
       })
 },
 
@@ -122,13 +123,22 @@ methods: {
         await this.socket.disconnect()
 
   },
-  onMessageSend(){
-    //  socket.emit("message", {
-    //     roomId: roomId,
-    //     message,
-    //     from: user.id,
-    //     date: moment(new Date()).unix(),
-    //   });
+  onMessageSend(message, roomId) {
+  
+      if (typeof message !== "string" || message.trim().length === 0) {
+        return;
+      }
+      if (!this.socket) {
+        /** Normally there shouldn't be such case. */
+        console.error("Couldn't send message");
+      }
+        //console.log(message,roomId,this.$auth.user.id)
+      this.socket.emit("message", {
+        roomId: roomId,
+        message,
+        from: this.$auth.user.id,
+        date: this.$moment(new Date()).unix(),
+      });
   },
   async onLogOut(){
     this.logout().then(() => {

@@ -23,6 +23,9 @@ export const state = () => ({
     },
     async setRooms({commit},payload){
       commit('SET_ROOMS',payload)
+    },
+    async setMessage({commit},payload){
+      commit('SET_MESSAGE',payload)
     }
   }
 
@@ -55,6 +58,18 @@ export const state = () => ({
         };
       });
       state.rooms = rooms
+    },
+    SET_MESSAGE(state,paylad){
+      state = {...state,
+        rooms: {
+          ...state.rooms,
+          [payload.id]: {
+            ...state.rooms[payload.id],
+            messages: payload.messages,
+            offset: payload.messages.length,
+          },
+        },
+      };
     }
 
   }

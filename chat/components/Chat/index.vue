@@ -25,51 +25,55 @@
           :onLoadMoreMessages="onLoadMoreMessages"
           class=" bg-blue-200"
           />
-          <!--
-
+          
           
           <TypingArea
-            :message="message"
-            :setMessage="setMessage"
-            :onSubmit="(e) => {
-              e.preventDefault();
-              onMessageSend(message.trim(), roomId);
-              setMessage('');
-
-              messageListElement.current.scrollTop =
-                messageListElement.current.scrollHeight;
-            }"
-          /> -->
+            v-model="message"
+            @setMessage="setMessage"
+            :onSubmit="onSubmit"
+          />
         </div>
       </div>
     </div>
 </template>
 <script>
-import { mapState } from "vuex"
+
+import { mapActions, mapState } from "vuex"
 import MessageList from "./MessageList/index.vue"
 import TypingArea from "./TypingArea/index.vue"
 
 export default {
     name: "Chat",
     props: {
+        onMessageSend:{type:Function},
         onLogOut: { type: Function },
         user: { type: Object }
     },
-    async fetch(){
-   
-    },
+ 
     data() {
         return {
-            room: { "name": "Room" },
+            //room: { "name": "Room" },
             dispatch: "",
-            messageListElement:"elementid",
+            messageListElement:{},
+            message:'',
+            // {
+            //      from: '',
+            //      date: '',
+            //      message: '',
+            //      roomId: ''},
             messages:[]
         };
     },
     computed: {
         ...mapState(["currentRoom"]),
         ...mapState(["rooms"]),
-        ...mapState(["users"])
+        ...mapState(["users"]),
+        room(){
+            return this.rooms[this.currentRoom]
+        },
+        roomId(){
+            return this.room.id
+        }
     },
     methods: {
         onLoadMoreMessages(){
@@ -77,7 +81,21 @@ export default {
         },
         onUserClicked(){
 
-        }
+        },
+        setMessage(event){
+            const {value} = event.target
+            this.message = value
+        },
+        onSubmit(e) {
+             
+               e.preventDefault();
+               this.onMessageSend(this.message.trim(), this.roomId);
+               this.$nextTick(()=>{
+                this.message= ''
+               })
+               //this.messageListElement.current.scrollTop = this.messageListElement.current.scrollHeight;
+         },
+          
     },
     components: { MessageList, TypingArea }
 }

@@ -5,12 +5,17 @@
   "main": "main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon main",
-    "start": "node main"
+    "dev": "nodemon server",
+    "start": "node server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@fastify/cookie": "^6.0.0",
+    "@fastify/env": "^3.0.0",
+    "@fastify/session": "^8.2.0",
+    "@mgcrea/fastify-session": "^0.15.2",
+    "@mgcrea/fastify-session-redis-store": "^0.11.0",
     "bcrypt": "^5.0.1",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.1",
@@ -19,6 +24,8 @@
     "dotenv": "^16.0.0",
     "express": "^4.17.3",
     "express-session": "^1.17.2",
+    "fastify": "^3.29.0",
+    "fastify-cookie": "^5.7.0",
     "ioredis": "^5.0.4",
     "jsonwebtoken": "^8.5.1",
     "milliparsec": "^2.2.1",
@@ -26,5 +33,8 @@
     "node-random-name": "^1.0.1",
     "nuxt-socket-io": "^2.0.3",
     "socket.io": "^4.5.0"
+  },
+  "devDependencies": {
+    "@types/ioredis": "^4.28.10"
   }
 }

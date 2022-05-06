@@ -10,13 +10,14 @@
 </template>
 
 <script>
+import { mapState } from "vuex"
+
 
  export default {
    name:'Index',
    middleware:'auth',
    data(){
      return {
-       users:{}
      }
    },
   //  async asyncData ({ app: { $apiservice } }) {
@@ -25,13 +26,16 @@
   //  },
    async fetch(){
     
-    let users = await this.$apiservice.getOnlineUsers()
+   // let users = await this.$apiservice.getOnlineUsers()
   
              //  console.log(users)
-    this.$store.dispatch('appendUsers',users);
+   // this.$store.dispatch('appendUsers',users);
      
    // console.log(this.users)
    // this.$store.dispatch('setUsers',this.users)
+   },
+   computed:{
+     ...mapState(['users'])
    },
    mounted () {
 
@@ -42,7 +46,8 @@
       withCredentials: true })
 
       this.socket.on('user.connected',async (newUser)=>{
-        //this.$store.dispatch('setUser',newUser)
+        console.log(newUser)
+      //  this.$store.dispatch('appendUsers',newUser)
 
       })
       this.socket.on('user.disconnected',(newUser)=>{
